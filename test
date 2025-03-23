@@ -1,111 +1,305 @@
-.fs-display-2xl {
-    @include fs-display-2xl;
+// Navbar
+//
+// Provide a static navbar from which we expand to create full-width, fixed, and
+// other navbar variations.
+
+.navbar {
+  // scss-docs-start navbar-css-vars
+  --#{$prefix}navbar-height: 70px;
+  --#{$prefix}navbar-padding-x: #{if($navbar-padding-x == null, 0, $navbar-padding-x)};
+  --#{$prefix}navbar-padding-y: #{$navbar-padding-y};
+  --#{$prefix}navbar-color: #{$navbar-light-color};
+  --#{$prefix}navbar-hover-color: #{$text-default};
+  --#{$prefix}navbar-hover-bg: #{$neutral-100};
+  --#{$prefix}navbar-disabled-color: #{$navbar-light-disabled-color};
+  --#{$prefix}navbar-active-color: #{$white};
+  --#{$prefix}navbar-active-bg: #{$primary-600};
+
+  --#{$prefix}navbar-brand-padding-y: #{$navbar-brand-padding-y};
+  --#{$prefix}navbar-brand-margin-end: #{$navbar-brand-margin-end};
+  --#{$prefix}navbar-brand-font-size: #{$navbar-brand-font-size};
+  --#{$prefix}navbar-brand-color: #{$navbar-light-brand-color};
+  --#{$prefix}navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+  --#{$prefix}navbar-nav-link-padding-x: #{$navbar-nav-link-padding-x};
+  --#{$prefix}navbar-toggler-padding-y: #{$navbar-toggler-padding-y};
+  --#{$prefix}navbar-toggler-padding-x: #{$navbar-toggler-padding-x};
+  --#{$prefix}navbar-toggler-font-size: #{$navbar-toggler-font-size};
+  --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-light-toggler-icon-bg)};
+  --#{$prefix}navbar-toggler-border-color: #{$navbar-light-toggler-border-color};
+  --#{$prefix}navbar-toggler-border-radius: #{$navbar-toggler-border-radius};
+  --#{$prefix}navbar-toggler-focus-width: #{$navbar-toggler-focus-width};
+  --#{$prefix}navbar-toggler-transition: #{$navbar-toggler-transition};
+  // scss-docs-end navbar-css-vars
+
+  position: relative;
+  display: flex;
+  flex-wrap: wrap; // allow us to do the line break for collapsing content
+  // align-items: center;
+  justify-content: space-between; // space out brand from logo
+  padding: var(--#{$prefix}navbar-padding-y) var(--#{$prefix}navbar-padding-x);
+  min-height: var(--#{$prefix}navbar-height);
+  @include gradient-bg();
+
+  // Because flex properties aren't inherited, we need to redeclare these first
+  // few properties so that content nested within behave properly.
+  // The `flex-wrap` property is inherited to simplify the expanded navbars
+  %container-flex-properties {
+    display: flex;
+    flex-wrap: inherit;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  >.container,
+  >.container-fluid {
+    @extend %container-flex-properties;
+  }
+
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    >.container#{breakpoint-infix($breakpoint, $container-max-widths)} {
+      @extend %container-flex-properties;
+    }
+  }
 }
 
-.fs-display-xl {
-    @include fs-display-xl;
+
+// Navbar brand
+//
+// Used for brand, project, or site names.
+
+.navbar-brand {
+  padding-top: var(--#{$prefix}navbar-brand-padding-y);
+  padding-bottom: var(--#{$prefix}navbar-brand-padding-y);
+  margin-right: var(--#{$prefix}navbar-brand-margin-end);
+  @include font-size(var(--#{$prefix}navbar-brand-font-size));
+  color: var(--#{$prefix}navbar-brand-color);
+  text-decoration: if($link-decoration ==none, null, none);
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    color: var(--#{$prefix}navbar-brand-hover-color);
+    text-decoration: if($link-hover-decoration ==underline, none, null);
+  }
 }
 
-.fs-display-lg {
-    @include fs-display-lg;
+
+// Navbar nav
+//
+// Custom navbar navigation (doesn't require `.nav`, but does make use of `.nav-link`).
+
+.navbar-nav {
+  // scss-docs-start navbar-nav-css-vars
+  --#{$prefix}nav-link-padding-x: 0;
+  --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y};
+  @include rfs($nav-link-font-size, --#{$prefix}nav-link-font-size);
+  --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight};
+  --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color);
+  --#{$prefix}nav-link-hover-color: var(--#{$prefix}navbar-hover-color);
+  --#{$prefix}nav-link-disabled-color: var(--#{$prefix}navbar-disabled-color);
+  // scss-docs-end navbar-nav-css-vars
+
+  display: flex;
+  flex-direction: column; // cannot use `inherit` to get the `.navbar`s value
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+
+  .nav-item:not(:first-child) {
+    margin-left: 10px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    position: relative;
+    @include border-radius(var(--#{$prefix}border-radius-sm));
+    font-weight: $nav-link-font-weight;
+
+    &::before {
+      content: "";
+      display: block;
+      width: calc(100% - var(--#{$prefix}navbar-nav-link-padding-x));
+      height: 8px;
+      @include border-radius(var(--#{$prefix}border-radius-lg));
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%);
+      background-color: transparent;
+    }
+
+    &:hover {
+      background: var(--#{$prefix}navbar-hover-bg);
+      color: var(--#{$prefix}navbar-hover-color);
+
+      &::before {
+        background-color: $neutral-400;
+      }
+    }
+
+    &.active,
+    &.show {
+      color: var(--#{$prefix}navbar-active-color);
+      background-color: var(--#{$prefix}navbar-active-bg);
+
+      &::before {
+        background-color: $primary-400;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    position: static;
+  }
 }
 
-.fs-display-md {
-    @include fs-display-md;
+
+// Navbar text
+//
+//
+
+.navbar-text {
+  padding-top: $nav-link-padding-y;
+  padding-bottom: $nav-link-padding-y;
+  color: var(--#{$prefix}navbar-color);
+
+  a,
+  a:hover,
+  a:focus {
+    color: var(--#{$prefix}navbar-active-color);
+  }
 }
 
-.fs-display-sm {
-    @include fs-display-sm;
+
+// Responsive navbar
+//
+// Custom styles for responsive collapsing and toggling of navbar contents.
+// Powered by the collapse Bootstrap JavaScript plugin.
+
+// When collapsed, prevent the toggleable navbar contents from appearing in
+// the default flexbox row orientation. Requires the use of `flex-wrap: wrap`
+// on the `.navbar` parent.
+.navbar-collapse {
+  flex-grow: 1;
+  flex-basis: 100%;
+  // For always expanded or extra full navbars, ensure content aligns itself
+  // properly vertically. Can be easily overridden with flex utilities.
+  align-items: center;
 }
 
-.fs-display-xs {
-    @include fs-display-xs;
+// Button for toggling the navbar when in its collapsed state
+.navbar-toggler {
+  padding: var(--#{$prefix}navbar-toggler-padding-y) var(--#{$prefix}navbar-toggler-padding-x);
+  @include font-size(var(--#{$prefix}navbar-toggler-font-size));
+  line-height: 1;
+  color: var(--#{$prefix}navbar-color);
+  background-color: transparent; // remove default button style
+  border: var(--#{$prefix}border-width) solid var(--#{$prefix}navbar-toggler-border-color); // remove default button style
+  @include border-radius(var(--#{$prefix}navbar-toggler-border-radius));
+  @include transition(var(--#{$prefix}navbar-toggler-transition));
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:focus {
+    text-decoration: none;
+    outline: 0;
+    box-shadow: 0 0 0 var(--#{$prefix}navbar-toggler-focus-width);
+  }
 }
 
-.fs-xl {
-    @include fs-xl;
+// Keep as a separate element so folks can easily override it with another icon
+// or image file as needed.
+.navbar-toggler-icon {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  background-image: var(--#{$prefix}navbar-toggler-icon-bg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
 }
 
-.fs-lg {
-    @include fs-lg;
+.navbar-nav-scroll {
+  max-height: var(--#{$prefix}scroll-height, 75vh);
+  overflow-y: auto;
 }
 
-.fs-md {
-    @include fs-md;
+// scss-docs-start navbar-expand-loop
+// Generate series of `.navbar-expand-*` responsive classes for configuring
+// where your navbar collapses.
+.navbar-expand {
+  @each $breakpoint in map-keys($grid-breakpoints) {
+    $next: breakpoint-next($breakpoint, $grid-breakpoints);
+    $infix: breakpoint-infix($next, $grid-breakpoints);
+
+    // stylelint-disable-next-line scss/selector-no-union-class-name
+    &#{$infix} {
+      @include media-breakpoint-up($next) {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+
+        .navbar-nav {
+          flex-direction: row;
+          align-self: stretch;
+
+          .dropdown-menu {
+            position: absolute;
+          }
+
+          .nav-link {
+            height: 100%;
+            padding-right: var(--#{$prefix}navbar-nav-link-padding-x);
+            padding-left: var(--#{$prefix}navbar-nav-link-padding-x);
+          }
+        }
+
+        .navbar-nav-scroll {
+          overflow: visible;
+        }
+
+        .navbar-collapse {
+          display: flex !important; // stylelint-disable-line declaration-no-important
+          flex-basis: auto;
+          align-self: stretch;
+        }
+
+        .navbar-toggler {
+          display: none;
+        }
+
+        .offcanvas {
+          // stylelint-disable declaration-no-important
+          position: static;
+          z-index: auto;
+          flex-grow: 1;
+          width: auto !important;
+          height: auto !important;
+          visibility: visible !important;
+          background-color: transparent !important;
+          border: 0 !important;
+          transform: none !important;
+          @include box-shadow(none);
+          @include transition(none);
+          // stylelint-enable declaration-no-important
+
+          .offcanvas-header {
+            display: none;
+          }
+
+          .offcanvas-body {
+            display: flex;
+            flex-grow: 0;
+            padding: 0;
+            overflow-y: visible;
+          }
+        }
+      }
+    }
+  }
 }
 
-.fs-sm {
-    @include fs-sm;
-}
-
-.fs-xs {
-    @include fs-xs;
-}
-
-.fs-2xs {
-    @include fs-2xs;
-}
-
-@mixin fs-display-2xl {
-    font-size: 4.5rem;
-    line-height: 5.625rem;
-    letter-spacing: -2%;
-}
-
-@mixin fs-display-xl {
-    font-size: 3.75rem;
-    line-height: 4.5rem;
-    letter-spacing: -2%;
-}
-
-@mixin fs-display-lg {
-    font-size: 3rem;
-    line-height: 3.75rem;
-    letter-spacing: -2%;
-}
-
-@mixin fs-display-md {
-    font-size: 2.25rem;
-    line-height: 2.75rem;
-    letter-spacing: -2%;
-}
-
-@mixin fs-display-sm {
-    font-size: 1.875rem;
-    line-height: 2.375rem;
-}
-
-@mixin fs-display-xs {
-    font-size: 1.5rem;
-    line-height: 2rem;
-}
-
-@mixin fs-xl {
-    font-size: 1.25rem;
-    line-height: 1.875rem;
-}
-
-@mixin fs-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-}
-
-@mixin fs-md {
-    font-size: 1rem;
-    line-height: 1.5rem;
-}
-
-@mixin fs-sm {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-}
-
-@mixin fs-xs {
-    font-size: 0.75rem;
-    line-height: 1.125rem;
-}
-
-@mixin fs-2xs {
-    font-size: 0.625rem;
-    line-height: 0.875rem;
-}
+// scss-docs-end navbar-expand-loop
